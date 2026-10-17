@@ -1,0 +1,70 @@
+blueprint:
+  name: IKEA Tradfri Schalter E1743 ZHA Steuerung
+  description: Maßgeschneiderte Blueprint für den IKEA Tradfri E1743 2-Tasten-Schalter über ZHA.
+  domain: automation
+  input:
+    automation_name:
+      name: Name der Automatisierung
+      description: Der Name für diese Automatisierung.
+      default: "IKEA E1743 Steuerung"
+      selector:
+        text:
+    remote_device:
+      name: Schalter (E1743)
+      selector:
+        device:
+          integration: zha
+    action_top_short:
+      name: Oben (I) - Kurzer Druck
+      default: []
+      selector:
+        action:
+    action_top_long:
+      name: Oben (I) - Langer Druck / Halten
+      default: []
+      selector:
+        action:
+    action_bottom_short:
+      name: Unten (O) - Kurzer Druck
+      default: []
+      selector:
+        action:
+    action_bottom_long:
+      name: Unten (O) - Langer Druck / Halten
+      default: []
+      selector:
+        action:
+
+mode: restart
+
+homeassistant:
+  name: !input automation_name
+
+triggers:
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input remote_device
+
+actions:
+  - choose:
+      # Oben (I) Kurzer Druck
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.event.data.command == 'on' }}"
+        sequence: !input action_top_short
+      # Unten (O) Kurzer Druck
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.event.data.command == 'off' }}"
+        sequence: !input action_bottom_short
+      # Oben (I) Langer Druck (Move Up)
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.event.data.command == 'move' and trigger.event.data.args[0] == 0 }}"
+        sequence: !input action_top_long
+      # Unten (O) Langer Druck (Move Down)
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.event.data.command == 'move' and trigger.event.data.args[0] == 1 }}"
+        sequence: !input action_bottom_long
