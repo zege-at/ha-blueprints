@@ -1,8 +1,14 @@
 blueprint:
-  name: IKEA Symfonisk Gen 2 Exakte ZHA Steuerung
-  description: Maßgeschneiderte Blueprint für die IKEA Symfonisk Gen 2 Remote basierend auf den echten ZHA-Events.
+  name: IKEA Symfonisk Gen 2 ZHA
+  description: Blueprint für IKEA SYMFONISK gen 2 Remote ZHA
   domain: automation
   input:
+    automation_name:
+      name: Name der Automatisierung
+      description: Der Name, den diese Automatisierung erhalten soll.
+      default: "Symfonisk Fernbedienung Steuerung"
+      selector:
+        text:
     remote_device:
       name: Fernbedienung
       selector:
