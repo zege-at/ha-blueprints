@@ -3,12 +3,6 @@ blueprint:
   description: Maßgeschneiderte Blueprint für den IKEA Tradfri E1743 2-Tasten-Schalter über ZHA.
   domain: automation
   input:
-    automation_name:
-      name: Name der Automatisierung
-      description: Der Name für diese Automatisierung.
-      default: "IKEA E1743 Steuerung"
-      selector:
-        text:
     remote_device:
       name: Schalter (E1743)
       selector:
@@ -36,9 +30,6 @@ blueprint:
         action:
 
 mode: restart
-
-homeassistant:
-  name: !input automation_name
 
 triggers:
   - trigger: event
