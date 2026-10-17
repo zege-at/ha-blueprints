@@ -1,0 +1,91 @@
+blueprint:
+  name: IKEA Symfonisk Gen 2 Exakte ZHA Steuerung
+  description: Maßgeschneiderte Blueprint für die IKEA Symfonisk Gen 2 Remote basierend auf den echten ZHA-Events.
+  domain: automation
+  input:
+    remote_device:
+      name: Fernbedienung
+      selector:
+        device:
+          integration: zha
+    action_volume_up:
+      name: Lauter (Oben)
+      default: []
+      selector:
+        action:
+    action_volume_down:
+      name: Leiser (Unten)
+      default: []
+      selector:
+        action:
+    action_next:
+      name: Nächster Titel (Rechts)
+      default: []
+      selector:
+        action:
+    action_prev:
+      name: Vorheriger Titel (Links)
+      default: []
+      selector:
+        action:
+    action_play_pause:
+      name: Play / Pause (Mitte)
+      default: []
+      selector:
+        action:
+    action_dot:
+      name: 1 Punkt Taste
+      default: []
+      selector:
+        action:
+    action_two_dots:
+      name: 2 Punkte Taste
+      default: []
+      selector:
+        action:
+
+mode: restart
+
+triggers:
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input remote_device
+
+actions:
+  - choose:
+      # Volume Up (move_with_on_off, arg 0)
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.event.data.command == 'move_with_on_off' and trigger.event.data.args[0] == 0 }}"
+        sequence: !input action_volume_up
+      # Volume Down (move_with_on_off, arg 1)
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.event.data.command == 'move_with_on_off' and trigger.event.data.args[0] == 1 }}"
+        sequence: !input action_volume_down
+      # Next / Rechts (step, arg 0)
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.event.data.command == 'step' and trigger.event.data.args[0] == 0 }}"
+        sequence: !input action_next
+      # Prev / Links (step, arg 1)
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.event.data.command == 'step' and trigger.event.data.args[0] == 1 }}"
+        sequence: !input action_prev
+      # Play / Pause (toggle)
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.event.data.command == 'toggle' }}"
+        sequence: !input action_play_pause
+      # 1 Punkt Taste (initial_press auf endpoint 2)
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.event.data.command == 'initial_press' and trigger.event.data.endpoint_id == 2 }}"
+        sequence: !input action_dot
+      # 2 Punkte Taste (initial_press auf endpoint 3)
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.event.data.command == 'initial_press' and trigger.event.data.endpoint_id == 3 }}"
+        sequence: !input action_two_dots
